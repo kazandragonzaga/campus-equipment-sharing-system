@@ -25,6 +25,7 @@ $message = strtolower($data["message"]);
 $equipment = null;
 $date = null;
 $time = null;
+$purpose = null;
 
 // Detect equipment
 if (strpos($message, "projector") !== false) {
@@ -56,6 +57,19 @@ if (strpos($message, "morning") !== false) {
     $time = "Evening";
 }
 
+// Detect purpose
+if (strpos($message, "presentation") !== false) {
+    $purpose = "Presentation";
+} elseif (strpos($message, "project") !== false) {
+    $purpose = "Project";
+} elseif (strpos($message, "report") !== false) {
+    $purpose = "Report";
+} elseif (strpos($message, "class") !== false) {
+    $purpose = "Class";
+} elseif (strpos($message, "event") !== false) {
+    $purpose = "Event";
+}
+
 // Generate reply
 if ($equipment) {
 
@@ -67,6 +81,10 @@ if ($equipment) {
 
     if ($time) {
         $reply .= " in the " . strtolower($time);
+    }
+
+    if ($purpose) {
+        $reply .= " for your " . strtolower($purpose);
     }
 
     $reply .= ". Please check the available equipment or submit a borrowing request.";
@@ -82,6 +100,7 @@ echo json_encode([
     "detected_equipment" => $equipment,
     "detected_date" => $date,
     "detected_time" => $time,
+    "detected_purpose" => $purpose,
     "reply" => $reply
 ]);
 
