@@ -27,6 +27,34 @@ $date = null;
 $time = null;
 $purpose = null;
 
+// Mock equipment data
+$availableEquipment = [
+    [
+        "id" => 1,
+        "name" => "Epson Projector",
+        "category" => "Projector",
+        "condition" => "Good",
+        "availability" => "Available",
+        "location" => "RTU Pasig Campus"
+    ],
+    [
+        "id" => 2,
+        "name" => "LAN Cable",
+        "category" => "Networking",
+        "condition" => "Good",
+        "availability" => "Available",
+        "location" => "RTU Pasig Campus"
+    ],
+    [
+        "id" => 3,
+        "name" => "JBL Speaker",
+        "category" => "Audio Equipment",
+        "condition" => "Good",
+        "availability" => "Borrowed",
+        "location" => "RTU Pasig Campus"
+    ]
+];
+
 // Detect equipment
 if (strpos($message, "projector") !== false) {
     $equipment = "Projector";
@@ -70,24 +98,34 @@ if (strpos($message, "presentation") !== false) {
     $purpose = "Event";
 }
 
+// Find available equipment
+$recommendation = null;
+
+foreach ($availableEquipment as $item) {
+
+    if (
+        $equipment &&
+        $item["category"] === $equipment &&
+        $item["availability"] === "Available"
+    ) {
+        $recommendation = $item;
+        break;
+    }
+}
+
 // Generate reply
-if ($equipment) {
+if ($recommendation) {
 
-    $reply = "I found your request for a " . $equipment;
+    $reply = "I found an available " .
+        $recommendation["name"] .
+        " at " .
+        $recommendation["location"] . ".";
 
-    if ($date) {
-        $reply .= " on " . $date;
-    }
+} elseif ($equipment) {
 
-    if ($time) {
-        $reply .= " in the " . strtolower($time);
-    }
-
-    if ($purpose) {
-        $reply .= " for your " . strtolower($purpose);
-    }
-
-    $reply .= ". Please check the available equipment or submit a borrowing request.";
+    $reply = "I could not find an available " .
+        $equipment .
+        " right now.";
 
 } else {
 
@@ -101,6 +139,7 @@ echo json_encode([
     "detected_date" => $date,
     "detected_time" => $time,
     "detected_purpose" => $purpose,
+    "recommendation" => $recommendation,
     "reply" => $reply
 ]);
 
